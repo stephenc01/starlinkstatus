@@ -1,0 +1,57 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          push: true
+          tags: stephenc01/starlinkstatus:latest
+ #     -
+ #       name: Build and push latest
+ #       uses: docker/build-push-action@v4
+ #       with:
+ #         context: ./php8.1
+ #         file: ./php8.1/Dockerfile
+ #         push: true
+ #         tags: stephenc01/php_docker_custom:latest, stephenc01/php_docker_custom:latest-modules, stephenc01/php_docker_custom:php8.1-modules
+ #     -
+ #       name: Build and push php 8
+ #       uses: docker/build-push-action@v4
+ #       with:
+ #         context: ./php8.0
+ #         file: ./php8.0/Dockerfile
+#          push: true
+#          tags: stephenc01/php_docker_custom:php8.0-modules
+#      - name: Docker Hub Description
+#        uses: peter-evans/dockerhub-description@v3
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#          repository: stephenc01/php_docker_custom
+#          readme-filepath: ./README.md
